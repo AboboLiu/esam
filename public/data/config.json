@@ -1,0 +1,19 @@
+{
+  "home": {
+    "city": "菏泽市",
+    "city_en": "Heze City",
+    "area": "菏泽市定陶区",
+    "area_en": "Dingtao District<br>Heze City",
+    "legend":"代表税务局位置",
+    "menu1": "组织介绍",
+    "menu2": "党员信息"
+  },
+  "info": {
+    "title": "党建品牌"
+  },
+  "list": {
+    "def": "中共党员",
+    "label1": "入党时间",
+    "label2": "对党说句心里话"
+  }
+}
