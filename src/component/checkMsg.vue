@@ -50,9 +50,10 @@ export default {
     border-radius: 4px;
     background-color: rgba(0, 0, 0, 0.8);
     min-width: 400px;
-    min-height: 30vh;
+    min-height: 20vh;
     display: flex;
     p {
+      font-size: 2.2vh;
       flex-grow: 1000;
       padding: 10px 20px;
     }
@@ -61,10 +62,10 @@ export default {
       .btn {
         width: 50%;
         text-align: center;
-        border-top: 1px solid #fff;
+        border-top: 1px solid rgba(255, 255, 255, 0.6);
         padding: 1em;
         & + .btn {
-          border-left: 1px solid #fff;
+          border-left: 1px solid rgba(255, 255, 255, 0.6);
         }
         &:active {
           background-color: rgba(255, 255, 255, 0.7);

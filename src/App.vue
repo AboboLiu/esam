@@ -6,7 +6,7 @@
 
 <style lang="less">
 * {
-  transition: all 0.3s;
+  transition: all 0.1s;
 }
 html,
 body,

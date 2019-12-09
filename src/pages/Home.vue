@@ -38,28 +38,34 @@
       </div>
       <p class="time">
         交卷倒计时
-        <strong v-text="time"></strong>
+        <strong :class="{'red':time<this.count*3}" v-text="time"></strong>
         秒
       </p>
       <p class="ask" v-text="formatAsk(t.q)"></p>
       <ol class="aws" type="A">
         <li v-for="(aw,i) in t.a" :key="i">
-          <span :class="{'cur':i===huida,'on':huida===null}" v-text="aw" @click="answer(i)"></span>
+          <span
+            :class="{'cur':i===huida,'on':huida===null,'y':i===t.r*1,'n':i!==t.r*1}"
+            v-text="aw"
+            @click="answer(i)"
+          ></span>
         </li>
       </ol>
-      <span v-if="huida===null" class="btn next" @click="next" v-text="btnTxt"></span>
-      <span
-        v-else-if="huida.toString()===t.r"
-        class="btn ok"
-        @click="next"
-        v-text="`回答正确, ${btnTxt}`"
-      ></span>
-      <span v-else class="btn err" @click="next">
-        回答错误, 正确答案(
-        <strong class="r" v-text="map[t.r]"></strong>),
-        <br />
-        <span v-text="btnTxt"></span>
-      </span>
+      <div class="btns">
+        <span v-if="huida===null" class="btn next" @click="next" v-text="btnTxt"></span>
+        <span
+          v-else-if="huida.toString()===t.r"
+          class="btn ok"
+          @click="next"
+          v-text="`回答正确, ${btnTxt}`"
+        ></span>
+        <span v-else class="btn err" @click="next">
+          回答错误, 正确答案(
+          <strong class="r" v-text="map[t.r]"></strong>),
+          <br />
+          <span v-text="btnTxt"></span>
+        </span>
+      </div>
     </div>
     <check-msg ref="tiao" @ok="toNext"></check-msg>
     <check-msg ref="submit" @ok=" submit();step=3"></check-msg>
@@ -87,7 +93,9 @@ export default {
       rank: 0,
       no: 0,
       empty: null,
-      mainH: null,
+      mainH1: null,
+      mainH2: null,
+      mainSrc: null,
       src: null,
       item: null,
       key: ""
@@ -96,9 +104,6 @@ export default {
   components: { checkMsg },
   created() {
     this.getData();
-    this.inv = setInterval(() => {
-      this.time -= 1;
-    }, 1000);
   },
   computed: {
     btnTxt() {
@@ -116,8 +121,9 @@ export default {
       } else {
         this.step -= 1;
         if (this.step === 1) {
-          this.h1 = this.mainH1;
-          this.h2 = this.mainH2;
+          this.h1 = this.data.h1;
+          this.h2 = this.data.h2;
+          this.src = this.data.src;
         }
       }
     },
@@ -130,14 +136,14 @@ export default {
         url: "/data/qlist.json"
       })
         .then(r => {
+          this.data = r.data;
+          this.time = r.data.time * 1;
           this.list = r.data.list;
           this.count = r.data.count;
           this.map = r.data.letter;
           this.empty = r.data.empty;
           this.h1 = r.data.h1;
           this.h2 = r.data.h2;
-          this.mainH1 = r.data.h1;
-          this.mainH2 = r.data.h2;
           this.src = r.data.src;
         })
         .catch(() => {
@@ -186,9 +192,16 @@ export default {
       this.qList = tmpList;
       this.t = this.qList[this.cur];
       this.cur = 0;
+      this.time = this.data.time;
       this.huida = null;
       this.fen = 0;
       this.step = 0;
+      this.inv = setInterval(() => {
+        this.time -= 1;
+        if (this.time <= 0) {
+          this.submit();
+        }
+      }, 1000);
     },
     answer(huida) {
       if (this.huida === null) {
@@ -242,6 +255,50 @@ export default {
 };
 </script>
 <style lang="scss">
+@keyframes last {
+  0% {
+    color: #fff;
+  }
+  80% {
+    color: #f00;
+  }
+}
+@keyframes r {
+  0% {
+    background-color: rgba(0, 255, 0, 0.1);
+    border: 1px solid #0f0;
+    color: #0f0;
+  }
+  90% {
+    background-color: rgba(255, 255, 255, 0.4);
+  }
+}
+@keyframes err {
+  0% {
+    background-color: #f00;
+    color: #fff;
+  }
+  5% {
+    left: 2px;
+  }
+  10% {
+    left: -4px;
+  }
+  15% {
+    left: 2px;
+  }
+  20% {
+    left: -4px;
+  }
+  25% {
+    left: 2px;
+  }
+  30% {
+    left: 0;
+    color: #f00;
+    // background-color: rgba(255, 255, 255, 0.4);
+  }
+}
 .bg {
   user-select: none;
   width: 100%;
@@ -259,16 +316,17 @@ export default {
     height: 70vh;
     border-radius: 1vh;
     &.ks {
-      height: 100%;
+      height: 100vh;
       border-radius: 0;
       box-sizing: border-box;
       padding: 0 30px;
-      h1 {
-        padding: 10vh 0 5vh;
-      }
+      display: flex;
+      flex-direction: column;
       .time {
+        flex-shrink: 0;
         color: rgba(255, 255, 255, 0.5);
         margin: 0;
+        height: 4vh;
         display: block;
         text-align: right;
         padding-right: 2vw;
@@ -277,26 +335,56 @@ export default {
           color: rgba(255, 255, 255, 1);
           opacity: 1;
           font-size: 1.2em;
+          &.red {
+            color: #f00;
+            font-weight: 600;
+            font-size: 2em;
+            animation: last 0.2s linear 0s infinite alternate;
+          }
         }
       }
       .ask {
         font-size: 3vh;
         margin: 4vh 0;
+        flex-shrink: 0;
       }
       .aws {
+        flex-shrink: 0;
         font-size: 2.2vh;
+        display: flex;
+        flex-direction: column;
+        margin: 0 0 0 3em;
+        padding: 0;
         li {
-          margin-bottom: 4vh;
           width: auto;
+          line-height: 1.6;
           span {
-            display: inline-block;
+            position: relative;
+            display: block;
             border-radius: 0.5vh;
-            padding: 1vh 2vw 1vh 0.5vw;
-            &.on:active,
-            &.cur {
+            float: left;
+            padding: 0 2vw 0 0.5vw;
+            border: 1px solid;
+            border-color: rgba(0, 0, 0, 0);
+            &.on:active {
               background-color: rgba(255, 255, 255, 0.4);
-              font-weight: 600;
+              border-color: rgba(0, 0, 0, 0);
             }
+            &.cur {
+              // background-color: rgba(255, 255, 255, 0.4);
+              // border-color: rgba(0, 0, 0, 0);
+              &.y {
+                animation: r 1s linear;
+                color: #0f0;
+              }
+              &.n {
+                animation: err 1s linear;
+                color: #f00;
+              }
+            }
+          }
+          & + li {
+            padding-top: 2.6vh;
           }
           &.r {
             color: #0f0;
@@ -312,31 +400,37 @@ export default {
           }
         }
       }
-      .next {
-        width: 200px;
-        margin: 10vh auto 0;
-      }
-      .ok {
-        width: 300px;
-        margin: 10vh auto 0;
-        color: #0f0;
-        background-color: rgba(0, 255, 0, 0.1);
-        border: 1px solid #0f0;
-      }
-      .err {
-        border: 1px solid #f00;
-        background-color: rgba(255, 0, 0, 0.1);
-        width: 400px;
-        margin: 10vh auto 0;
-        font-size: 2.6vh;
-        color: rbga(255, 255, 255, 0.6);
-        .r {
+      .btns {
+        display: flex;
+        align-content: center;
+        justify-content: center;
+        align-items: center;
+        justify-items: center;
+        flex-grow: 100;
+        flex-shrink: 1;
+        .next {
+          width: 200px;
+        }
+        .ok {
+          width: 300px;
           color: #0f0;
+          background-color: rgba(0, 255, 0, 0.1);
+          border: 1px solid #0f0;
+        }
+        .err {
+          border: 1px solid #f00;
+          background-color: rgba(255, 0, 0, 0.1);
+          width: 400px;
+          color: rbga(255, 255, 255, 0.6);
+          .r {
+            color: #0f0;
+          }
         }
       }
     }
     .title {
       display: flex;
+      flex-direction: column;
       height: 24vh;
       align-items: center;
       justify-content: center;
@@ -356,17 +450,17 @@ export default {
         }
       }
       h2 {
-        color: rgba(255, 255, 255, 0.9);
+        color: rgba(255, 255, 255, 0.7);
         text-align: center;
         padding: 0;
         font-size: 3vh;
-        margin: 0;
+        margin: 1vh auto 0;
         font-weight: 400;
       }
     }
 
     .btn {
-      font-size: 3vh;
+      font-size: 2.4vh;
       display: block;
       text-align: center;
       font-weight: 400;
@@ -384,11 +478,14 @@ export default {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
+      align-content: space-between;
+      height: 32vh;
+
       width: 700px;
       margin: 0 auto;
       li {
         width: 300px;
-        margin: 0 0 6vh;
+        // margin: 0 0 6vh;
       }
     }
     .menu {
