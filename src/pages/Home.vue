@@ -2,13 +2,11 @@
   <div class="bg">
     <strong class="back" @click="back" v-if="step!==1"></strong>
     <div class="content" v-if="step">
-      <div class="title">
-        <h1>
-          <img :src="src" />
-          <span v-text="h1"></span>
-        </h1>
-        <h2 v-text="h2"></h2>
-      </div>
+      <h1>
+        <img :src="src" />
+        <span v-text="h1"></span>
+      </h1>
+      <h4 v-text="h4"></h4>
       <ul v-if="step===1" class="fmenu">
         <li v-for="(t,i) in list" class="btn" v-text="t.title" :key="i" @click="check(t,i)"></li>
       </ul>
@@ -27,15 +25,13 @@
           <strong v-text="rank"></strong> 名
         </h5>
       </div>
+      <h2 v-if="step!==3" v-text="h2"></h2>
     </div>
     <div v-else class="content ks">
-      <div class="title">
-        <h1>
-          <img :src="src" />
-          <span v-text="h1"></span>
-        </h1>
-        <h2 v-text="h2"></h2>
-      </div>
+      <h1>
+        <img :src="src" />
+        <span v-html="h1"></span>
+      </h1>
       <p class="time">
         交卷倒计时
         <strong :class="{'red':time<this.count*3}" v-text="time"></strong>
@@ -78,6 +74,7 @@ export default {
     return {
       h1: "",
       h2: "",
+      h4: "",
       step: 1,
       time: 600,
       mode: 1,
@@ -123,6 +120,7 @@ export default {
         if (this.step === 1) {
           this.h1 = this.data.h1;
           this.h2 = this.data.h2;
+          this.h4 = "";
           this.src = this.data.src;
         }
       }
@@ -174,6 +172,7 @@ export default {
       this.item = item;
       this.h1 = this.item.h1;
       this.h2 = this.item.h2;
+      this.h4 = this.item.title;
       this.src = this.item.src || this.src;
       this.step = 2;
       this.setDefCount();
@@ -428,35 +427,37 @@ export default {
         }
       }
     }
-    .title {
+    h1 {
+      text-align: center;
+      margin: 0;
+      font-size: 3.5vh;
+      line-height: 2em;
+      font-weight: 600;
       display: flex;
-      flex-direction: column;
-      height: 24vh;
       align-items: center;
       justify-content: center;
-      flex-wrap: wrap;
-      h1 {
-        width: 100%;
-        margin: 0;
-        font-size: 3.5vh;
-        font-weight: 400;
-        display: flex;
-        align-content: center;
-        justify-content: center;
-        align-items: center;
-        img {
-          height: 2em;
-          margin-right: 0.5em;
-        }
+      padding: 6vh 0;
+      img {
+        height: 1.2em;
+        margin-right: 0.5em;
       }
-      h2 {
-        color: rgba(255, 255, 255, 0.7);
-        text-align: center;
-        padding: 0;
-        font-size: 3vh;
-        margin: 1vh auto 0;
-        font-weight: 400;
-      }
+    }
+    h2 {
+      color: rgba(255, 255, 255, 0.9);
+      text-align: center;
+      padding: 0;
+      font-size: 3vh;
+      margin: 0 auto 4vh;
+      font-weight: 400;
+    }
+    h4 {
+      text-align: center;
+      font-size: 3vh;
+      position: relative;
+      top: -6vh;
+      font-weight: 400;
+      line-height: 1;
+      margin: 3vh 0
     }
 
     .btn {
@@ -472,7 +473,7 @@ export default {
       }
     }
     .fmenu {
-      margin: 0;
+      margin: 0 auto 4vh;
       padding: 0;
       list-style: none;
       display: flex;
@@ -480,15 +481,14 @@ export default {
       justify-content: space-between;
       align-content: space-between;
       height: 32vh;
-
       width: 700px;
-      margin: 0 auto;
       li {
         width: 300px;
         // margin: 0 0 6vh;
       }
     }
     .menu {
+      margin-bottom: 12vh;
       h3 {
         width: 500px;
         margin: 0 auto 5vh;
