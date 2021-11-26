@@ -1,31 +1,30 @@
 <template>
   <div class="bg">
-    <strong class="back" @click="back" v-if="step!==1"></strong>
+    <strong class="back" @click="back" v-if="step !== 1"></strong>
     <div class="content" v-if="step">
       <h1>
         <img :src="src" />
         <span v-text="h1"></span>
       </h1>
       <h4 v-text="h4"></h4>
-      <ul v-if="step===1" class="fmenu">
-        <li v-for="(t,i) in list" class="btn" v-text="t.title" :key="i" @click="check(t,i)"></li>
+      <ul v-if="step === 1" class="fmenu">
+        <li v-for="(t, i) in list" class="btn" v-text="t.title" :key="i" @click="check(t, i)"></li>
       </ul>
-      <div v-else-if="step===2" class="menu">
+      <div v-else-if="step === 2" class="menu">
         <h3 class="btn" @click="go(1)">模拟测试</h3>
         <h3 class="btn" @click="go(2)">在线考试</h3>
       </div>
-      <div v-else-if="step===3" class="submit">
+      <div v-else-if="step === 3" class="submit">
         <h3>
           考试成绩:
           <strong v-text="parseInt(fen)">0</strong> 分
         </h3>
         <h5>
           我是 No.
-          <strong v-text="no"></strong> 位, 成绩总排名为第
-          <strong v-text="rank"></strong> 名
+          <strong v-text="no"></strong> 位, 成绩总排名为第 <strong v-text="rank"></strong> 名
         </h5>
       </div>
-      <h2 v-if="step!==3" v-text="h2"></h2>
+      <h2 v-if="step !== 3" v-text="h2"></h2>
     </div>
     <div v-else class="content ks">
       <h1>
@@ -34,23 +33,23 @@
       </h1>
       <p class="time">
         交卷倒计时
-        <strong :class="{'red':time<this.count*3}" v-text="time"></strong>
+        <strong :class="{ red: time < this.count * 3 }" v-text="time"></strong>
         秒
       </p>
       <p class="ask" v-text="formatAsk(t.q)"></p>
       <ol class="aws" type="A">
-        <li v-for="(aw,i) in t.a" :key="i">
+        <li v-for="(aw, i) in t.a" :key="i">
           <span
-            :class="{'cur':i===huida,'on':huida===null,'y':i===t.r*1,'n':i!==t.r*1}"
+            :class="{ cur: i === huida, on: huida === null, y: i === t.r * 1, n: i !== t.r * 1 }"
             v-text="aw"
             @click="answer(i)"
           ></span>
         </li>
       </ol>
       <div class="btns">
-        <span v-if="huida===null" class="btn next" @click="next" v-text="btnTxt"></span>
+        <span v-if="huida === null" class="btn next" @click="next" v-text="btnTxt"></span>
         <span
-          v-else-if="huida.toString()===t.r"
+          v-else-if="huida.toString() === t.r"
           class="btn ok"
           @click="next"
           v-text="`回答正确, ${btnTxt}`"
@@ -64,7 +63,13 @@
       </div>
     </div>
     <check-msg ref="tiao" @ok="toNext"></check-msg>
-    <check-msg ref="submit" @ok=" submit();step=3"></check-msg>
+    <check-msg
+      ref="submit"
+      @ok="
+        submit();
+        step = 3;
+      "
+    ></check-msg>
   </div>
 </template>
 <script>
@@ -150,9 +155,7 @@ export default {
     },
     setDefCount() {
       let defCount = parseInt(localStorage.getItem("defCount"));
-      defCount = isNaN(defCount)
-        ? parseInt(Math.random() * 200 + 1000)
-        : defCount;
+      defCount = isNaN(defCount) ? parseInt(Math.random() * 200 + 1000) : defCount;
       localStorage.setItem("defCount", defCount);
       let ks = JSON.parse(localStorage.getItem(this.key));
       if (!ks || ks.length < defCount) {
@@ -184,9 +187,7 @@ export default {
       this.mode = mode;
       let tmpList = [];
       for (let i = 0; i < this.count; i++) {
-        tmpList.push(
-          ...this.item.qs.splice(this.random(this.item.qs.length), 1)
-        );
+        tmpList.push(...this.item.qs.splice(this.random(this.item.qs.length), 1));
       }
       this.qList = tmpList;
       this.t = this.qList[this.cur];
@@ -253,7 +254,7 @@ export default {
   }
 };
 </script>
-<style lang="scss">
+<style lang="less">
 @keyframes last {
   0% {
     color: #fff;
@@ -457,7 +458,7 @@ export default {
       top: -6vh;
       font-weight: 400;
       line-height: 1;
-      margin: 3vh 0
+      margin: 3vh 0;
     }
 
     .btn {

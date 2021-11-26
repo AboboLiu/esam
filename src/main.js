@@ -7,6 +7,7 @@ Vue.config.productionTip = false;
 import axios from 'axios';
 Vue.prototype.$http = axios;
 import 'element-ui/lib/theme-chalk/index.css';
+import './wt/old';
 new Vue({
     router,
     store,

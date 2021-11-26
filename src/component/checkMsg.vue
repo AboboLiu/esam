@@ -33,7 +33,7 @@ export default {
   }
 };
 </script>
-<style scoped lang="scss">
+<style scoped lang="less">
 .msg-bg {
   /* background-color: rgba(0, 0, 0, 0.5); */
   position: fixed;
